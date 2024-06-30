@@ -1,0 +1,23 @@
+---
+type: object
+additionalProperties: false
+required: [id, is-alive, type, name, age]
+properties:
+    id:         {enum: [cat, dog]} # same as {type: string, enum: [cat, dog]}
+
+    is-alive:   {type: boolean}
+
+    type:       {type: string, enum: [cat, dog]}
+    name:       {type: string, minLength: 1}
+    nickname:   {type: string, minLength: 5, maxLength: 20}
+    account:    {type: string, pattern: '^[A-Za-z0-9-_]+$'}
+
+    age:        {type: integer, min: 0, max: 100}
+    height:     {type: number, multipleOf: 42}
+    weight:     {type: number, exclusiveMinimum: 1}
+
+    awards:     {type: array, items: {type: string}}
+
+#    is-alive:   {type: boolean}
+#    is dead@:    {type: boolean}
+#    is dead!:    {type: boolean}

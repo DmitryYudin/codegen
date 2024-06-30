@@ -1,0 +1,19 @@
+---
+type: object
+additionalProperties: false
+required: [task_id, source, destination]
+properties:
+    task_id:        {$ref: definitions.yaml#/definitions/TaskId}
+    source:         {$ref: definitions.yaml#/definitions/FileAddr}
+    destination:    {$ref: definitions.yaml#/definitions/FileAddr}
+    transform:      {$ref: "#/definitions/Transform"}
+
+definitions:
+    Transform:
+        type: object
+        additionalProperties: false #{type: number}
+        required: [angle, x, y]
+        properties:
+            angle: {type: number}
+            x: {type: number}
+            y: {type: number}

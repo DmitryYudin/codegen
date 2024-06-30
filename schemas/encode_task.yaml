@@ -1,0 +1,10 @@
+---
+type: object
+additionalProperties: false
+required: [task_id, source, destination, options]
+properties:
+    task_id:        {$ref: definitions.yaml#/definitions/TaskId}
+    source:         {$ref: definitions.yaml#/definitions/FileAddr}
+    destination:    {$ref: definitions.yaml#/definitions/FileAddr}
+    bitrate:        {type: integer, min: 0}
+    options:        {$ref: definitions.yaml#/definitions/StringOptions}

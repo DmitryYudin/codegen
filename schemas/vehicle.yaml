@@ -1,0 +1,30 @@
+---
+type: object
+additionalProperties: false
+required: [id, type, drivers, props]
+properties:
+    id:         {$ref: "#/definitions/Id"}
+    type:       {$ref: "#/definitions/Type"}
+    drivers:    {type: array, items: {$ref: "#/definitions/Driver"} }
+    props:      {$ref: "#/definitions/Props"}
+
+definitions:
+    Id:
+        type: string
+        pattern: '^[A-Za-z0-9-_]+$'
+
+    Type:
+        enum: [bicycle, car, truck]
+
+    Driver:
+        type: object
+        additionalProperties: false #{type: number}
+        required: [name, id]
+        properties:
+            name: {type: string, min: 5}
+            id: {$ref: "#/definitions/Id"}
+
+    Props:
+        type: object
+        additionalProperties: {type: string}
+

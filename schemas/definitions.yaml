@@ -1,0 +1,36 @@
+---
+type: object
+additionalProperties: false
+
+definitions:
+    TaskId:
+        type: string
+        pattern: '^[A-Za-z0-9-_]+$'
+
+    StringOptions:
+        type: object
+        additionalProperties: {type: string}
+
+    FsFileAddr:
+        type: object
+        additionalProperties: false
+        required: [provider, file_uri]
+        properties:
+            provider:  {type: string, enum: [fs]}
+            file_uri:  {type: string, minLength: 1}
+
+    S3FileAddr:
+        type: object
+        additionalProperties: false
+        required: [provider, file_uri, host_uri, bucket]
+        properties:
+            provider:  {type: string, enum: [s3]}
+            file_uri:  {type: string, minLength: 1}
+            s3_region: {type: string}
+            host_uri:  {type: string, minLength: 1}
+            bucket:    {type: string, minLength: 1}
+
+    FileAddr:
+        anyOf:
+        - {$ref: "#/definitions/FsFileAddr"}
+        - {$ref: "#/definitions/S3FileAddr"}
