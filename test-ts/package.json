@@ -1,0 +1,46 @@
+{
+  "name": "codegen-test",
+  "version": "2.0.0",
+  "description": "Codegen test",
+  "main": "dist/src/app.js",
+  "scripts": {
+    "start": "tsc && tsc-alias && node .",
+    "clean": "rm -rf -- dist",
+    "lint": "eslint test --ext .ts",
+    "lint-fix": "eslint test --ext .ts --fix",
+    "gen": "./codegen.sh",
+    "postinstall": "npm run gen",
+    "build": "tsc && tsc-alias",
+    "watch-ts": "tsc && (concurrently \"tsc -w\" \"tsc-alias -w\")",
+    "test": "TS_NODE_COMPILER_OPTIONS='{\"noImplicitThis\": false}' ts-mocha --timeout 120000 --paths --type-check -p tsconfig.json test/**/*.spec.ts"
+  },
+  "author": "Dmitry Yudin",
+  "license": "ISC",
+  "dependencies": {
+    "ajv": "^8.16.0",
+    "dateformat": "^5.0.3",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@tsconfig/node18": "^18.2.4",
+    "@types/chai": "^4.3.16",
+    "@types/chai-as-promised": "^7.1.8",
+    "@types/dateformat": "^5.0.2",
+    "@types/glob": "^8.1.0",
+    "@types/jest": "^29.5.12",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^20.14.9",
+    "@typescript-eslint/eslint-plugin": "^7.14.1",
+    "@typescript-eslint/parser": "^7.14.1",
+    "chai": ">=4.0.0 <5.0.0",
+    "chai-as-promised": ">=7.1.1 <8.0.0",
+    "eslint": ">=8.0.0 <=9.0.0",
+    "eslint-config-standard": "^17.1.0",
+    "mocha": "<=10.2.0",
+    "ts-jest": "^29.1.5",
+    "ts-mocha": "^10.0.0",
+    "tsc-alias": "^1.8.10",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.5.2"
+  }
+}
