@@ -1,0 +1,173 @@
+{
+    // Folders
+    //
+    //  Only folders defined here are included into workspace view
+    //
+    "folders": [
+        { "name": "gen", "path": "codegen/gen" },
+        { "name": "schemas", "path": "../schemas" },
+        { "name": "test", "path": "test" },
+    ],
+
+    //
+    // Settings
+    //
+    "settings": {
+        "cmake.configureOnOpen": false,
+        "extensions.ignoreRecommendations": true,
+        "debug.saveBeforeStart": "allEditorsInActiveGroup",
+        "debug.inlineValues": "off",
+        "security.workspace.trust.untrustedFiles": "open",
+        "debug.console.closeOnEnd": true,
+        "debug.openExplorerOnEnd": true,
+        "debug.terminal.clearBeforeReusing": true,
+        "terminal.integrated.tabs.enabled": false, 
+        
+        "files.exclude": {
+            "**/CMakeLists.txt": true,
+            "**/.gitignore": true,
+        },
+
+        "search.exclude": {
+        },
+
+        "files.watcherExclude": {
+            "**/.git/**": true,
+            "**/node_modules/*/**": true,
+        },
+
+        "C_Cpp.intelliSenseEngine": "disabled",
+        "clangd.arguments": [
+            "--clang-tidy=false",
+            "--background-index",
+            //"--compile-commands-dir=build"
+        ],
+
+        "workbench.colorTheme": "Default Light+",
+        "editor.inlayHints.enabled": "off",
+        "editor.autoClosingComments": "never",
+        "editor.defaultFoldingRangeProvider": "vadimcn.vscode-lldb",
+        "editor.defaultFormatter": "ms-vscode.cpptools",
+        "editor.minimap.enabled": false,
+        "editor.fontLigatures": true,
+        "editor.stickyScroll.enabled": false,
+        "git.openRepositoryInParentFolders": "never",
+        "window.titleBarStyle": "custom",
+        "window.density.editorTabHeight": "compact",
+        "window.dialogStyle": "custom",
+        "scm.autoReveal": false,
+        "scm.countBadge": "off",
+        "workbench.iconTheme": "vs-minimal",
+    },
+
+    //
+    // Recomendations
+    //
+    "extensions": {
+        "unwantedRecommendations": [],
+        "recommendations": [
+            // https://github.com/vadimcn/codelldb/issues/405#issuecomment-757029383
+    
+            // NOTE: At the moment this only works on Darwin.
+            // "lanza.lldb-vscode", // "type": "lldb-vscode"
+            "vadimcn.vscode-lldb", // "type": "lldb"
+            "llvm-vs-code-extensions.vscode-clangd",
+    
+            // F2       - Bookmarks: Jump to next
+            // F2+Shift - Bookmarks: Jump to previous
+            // F2+Ctrl  - Bookmarks: Toggle
+            "alefragnani.bookmarks",
+            "ms-vscode-remote.remote-ssh",
+            "ms-python.python",
+            // "ms-vscode.cpptools",
+            "ms-vscode.cpptools-themes",
+            "ouweiya.copy-file-name",
+            "sanaajani.taskrunnercode",
+            "jeff-hykin.better-cpp-syntax",
+        ]    
+    },
+
+    //
+    // Build tasks
+    //
+    "tasks": { // https://code.visualstudio.com/docs/editor/variables-reference
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "build",
+                "type": "shell",
+                "options": {
+                    "cwd": "${workspaceFolder:test}/..",
+                },
+                "command": "./build-simple.sh",
+                "problemMatcher": "$gcc",
+                "group": {
+                    "kind": "build",
+                    "isDefault": true,                
+                },
+                "runOptions": {
+                    "instanceLimit": 1
+                },
+                "presentation": {
+                    "echo": true,
+                    // "reveal": "silent",
+                    "focus": false,
+                    "panel": "shared",
+                    "showReuseMessage": false,
+                    "clear": true
+                }   
+            }
+        ],
+        "inputs": [
+            {
+                "id": "terminate",
+                "type": "command",
+                "command": "workbench.action.tasks.terminate",
+                "args": "terminateAll"
+            }
+        ],    
+    },
+
+    //
+    // Launch
+    //
+    "launch": {
+        "configurations": [ {
+            "type": "lldb",
+            "name": "(lldb) Launch",
+            "request": "launch",
+            "env": {
+                "ASAN_OPTIONS":"detect_leaks=false",
+            },
+
+            "program": "${workspaceFolder:test}/../build/bin/codegen-gtest",
+            "cwd": "${workspaceFolder:test}/../build/bin",
+        }, {
+            "type": "cppdbg",
+            "name": "(cppdbg) Launch",
+            "request": "launch",
+            "program": "${workspaceFolder:test}/../build/bin/codegen-gtest",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [
+                //{"name": "LSAN_OPTIONS", "value": "verbosity=1:log_threads=1"}
+                {"name": "ASAN_OPTIONS", "value": "detect_leaks=false"}
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]},
+        ]
+    },
+}

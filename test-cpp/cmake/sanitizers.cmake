@@ -1,0 +1,96 @@
+option(ENABLE_ASAN "Enable address sanitizer" OFF)
+option(ENABLE_TSAN "Enable thread sanitizer" OFF)
+option(ENABLE_UBSAN "Enable undefined behaviour sanitizer" OFF)
+option(ENABLE_SANITAIZER_STATIC "Enable sanitizer static linkage" OFF)
+option(ENABLE_SANITAIZER_SHARED "Enable sanitizer shared linkage" OFF)
+
+if(ENABLE_ASAN AND ENABLE_TSAN)
+    message(FATAL_ERROR "Cannot use ASAN and TSAN together")
+endif()
+
+###############################################################################
+# Set sanitizers linkage type: default, static or shared
+###############################################################################
+# shared linkage helpers:
+# LD_LIBRARY_PATH=$(dirname $(clang --print-file-name libclang_rt.asan-x86_64.so)) ./memory-leak
+# LD_LIBRARY_PATH=$(dirname $(gcc -print-file-name=libasan.so)) ./memory-leak
+if(ENABLE_SANITAIZER_STATIC AND ENABLE_SANITAIZER_SHARED)
+    message(FATAL_ERROR "Cannot use static and shared sanitizer linkage together")
+elseif(NOT ENABLE_SANITAIZER_STATIC AND NOT ENABLE_SANITAIZER_SHARED)
+    # cmake-default: gcc=shared clang=static
+elseif(ENABLE_ASAN OR ENABLE_TSAN OR ENABLE_UBSAN)
+    function(set_sanitizer_linkage)
+        if(ENABLE_SANITAIZER_STATIC)
+            set(SANITIZER_LINKAGE_TYPE static)
+        elseif(ENABLE_SANITAIZER_SHARED)
+            set(SANITIZER_LINKAGE_TYPE shared)
+        endif()
+        if ("Clang" STREQUAL CMAKE_C_COMPILER_ID)
+            add_link_options(-${SANITIZER_LINKAGE_TYPE}-libsan)
+        else()
+            if(ENABLE_ASAN)
+                add_link_options(-${SANITIZER_LINKAGE_TYPE}-libasan)
+            endif()
+            if(ENABLE_TSAN)
+                add_link_options(-${SANITIZER_LINKAGE_TYPE}-libtsan)
+            endif()
+            if(ENABLE_UBSAN)
+                add_link_options(-${SANITIZER_LINKAGE_TYPE}-libubsan)
+            endif()
+        endif()
+    endfunction()
+    set_sanitizer_linkage()
+endif()
+
+###############################################################################
+# Enable sanitizers
+###############################################################################
+if(ENABLE_ASAN OR ENABLE_TSAN OR ENABLE_UBSAN)
+    add_compile_options(-fno-sanitize-recover=all)
+    add_compile_options(-fno-omit-frame-pointer)
+    if(ENABLE_ASAN)
+        add_compile_options(-fsanitize=address)
+        add_link_options(-fsanitize=address)
+        if ("Windows" STREQUAL CMAKE_SYSTEM_NAME)
+            # https://github.com/llvm/llvm-project/issues/56300#issuecomment-1190564205
+            add_compile_definitions(_DISABLE_STRING_ANNOTATION=1)
+            add_compile_definitions(_DISABLE_VECTOR_ANNOTATION=1)
+        endif ()
+    endif()
+    if(ENABLE_TSAN)
+        add_compile_options(-fsanitize=thread)
+        add_link_options(-fsanitize=thread)
+    endif()
+    if(ENABLE_UBSAN)
+        add_compile_options(-fsanitize=undefined)
+        add_link_options(-fsanitize=undefined)
+    endif()
+endif()
+
+###############################################################################
+# Pretty print sanitizer configuration
+###############################################################################
+function(get_sanitizers_config_str var)
+    set(sanitizers)
+    if(ENABLE_ASAN OR ENABLE_TSAN OR ENABLE_UBSAN)
+        if(NOT DEFINED SANITIZER_LINKAGE_TYPE)
+            set(link default)
+        else()
+            set(link ${SANITIZER_LINKAGE_TYPE})
+        endif()
+        if(ENABLE_ASAN)
+            set(sanitizers "${sanitizers} asan")
+        endif()
+        if(ENABLE_TSAN)
+            set(sanitizers "${sanitizers} tsan")
+        endif()
+        if(ENABLE_UBSAN)
+            set(sanitizers "${sanitizers} ubsan")
+        endif()
+        set(INFO "${sanitizers} [${link}]")
+        string(STRIP ${INFO} INFO)
+    else()
+        set(INFO "no-sanitizer")
+    endif()
+    set(${var} ${INFO} PARENT_SCOPE)
+endfunction()

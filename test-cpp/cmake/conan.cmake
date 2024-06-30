@@ -1,0 +1,5 @@
+set(CONAN_DISABLE_CHECK_COMPILER ON)
+set(CMAKE_MESSAGE_LOG_LEVEL WARNING)
+include(${CMAKE_BINARY_DIR}/conan/conanbuildinfo.cmake)
+conan_basic_setup(TARGETS)
+set(CMAKE_MESSAGE_LOG_LEVEL)
